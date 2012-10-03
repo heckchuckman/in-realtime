@@ -132,8 +132,10 @@ function irtAssetChecker($assets) {
 	foreach ($assets as $irtPostData) {
 
 		$irtFileCheckStandard = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['' . $irtPostImgPref . '']['url']));
+		// $irtFileCheckLowRes = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['low_resolution']['url']));
+		// $irtFileCheckThumbnail = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['thumbnail']['url']));
 
-		if (!$irtFileCheckStandard) {
+		if (!$irtFileCheckStandard) { // && !$irtFileCheckLowRes && !$irtFileCheckThumbnail
 			
 			$irtPostImg = $irtPostData['images']['' . $irtPostImgPref . '']['url'];
 

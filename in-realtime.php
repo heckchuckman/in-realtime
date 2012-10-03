@@ -2,9 +2,9 @@
 
 /*
 Plugin Name: In Real-Time
-Plugin URI: http://heckchuckman.com/inrealtime
+Plugin URI: http://heckchuckman.com/in-realtime
 Description: In Real-Time is a different kind of Instagram plug-in. Using the Instagram Real-time API, this plug-in is developed for users that want posts created automatically for each photo, rather than have a widget or post with images embedded. Developed for Devs but useful for all.
-Version: 0.5
+Version: 1.0
 Author: Chuck Heckman
 Author URI: heckchuckman.com
 License: GPL2
