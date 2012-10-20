@@ -31,7 +31,7 @@ if (isset($irtCode)) {
 		'client_id' => '' . $irtOptions['clientID'] . '',
 		'client_secret' => '' . $irtOptions['clientSecret'] . '',
 		'grant_type' => 'authorization_code',
-		'redirect_uri' => 'http://' . $_SERVER['SERVER_NAME'] . '/wp-content/plugins/in-realtime/irt-callback.php',
+		'redirect_uri' => IRT_URL . 'irt-callback.php', //'http://' . $_SERVER['SERVER_NAME'] . '/wp-content/plugins/in-realtime/irt-callback.php',
 		'code' => '' . $irtCode . ''
 	);
 
@@ -90,7 +90,7 @@ if (isset($irtCode)) {
 		'object_id' => '' . $authUser . '',
 		'aspect' => 'media',
 		'verify_token' => '' . $authToken . '',
-		'callback_url' => 'http://' . $_SERVER['SERVER_NAME'] . '/wp-content/plugins/in-realtime/irt-callback.php',
+		'callback_url' => IRT_URL . 'irt-callback.php', //'http://' . $_SERVER['SERVER_NAME'] . '/wp-content/plugins/in-realtime/irt-callback.php',
 	);
 
 	foreach($irtPostSubArgs as $key=>$value) {
@@ -137,11 +137,7 @@ if (isset($irtCode)) {
 // the token echo for authorization
 //
 if (isset($irtToken)) {
-	
 	echo $irtToken;
-
-	// if ($irtOptions['emailNotify']['notify'] == 'yes') irtEmailNotifications($irtOptions['emailNotify']['address'], 'In Real-Time : token callback', 'token = '. $irtToken . '');
-
 }
 //
 // the main callback functionality. this is the meat.

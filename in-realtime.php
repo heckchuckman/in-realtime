@@ -12,9 +12,17 @@ License: GPL2
 
 if (is_admin()) {
 
+	if ( !defined('IRT_SITE') )
+		define( 'IRT_SITE', get_site_url() . '/' );
+
+	if ( !defined('IRT_URL') )
+		define( 'IRT_URL', plugin_dir_url( __FILE__ ) );
+	
+	if ( !defined('IRT_PATH') )
+		define( 'IRT_PATH', plugin_dir_path( __FILE__ ) );
+
 	// get settings
-	include_once($_SERVER['DOCUMENT_ROOT'] . '/wp-content/plugins/in-realtime/irt-options.php');
-	$irtUrl = $_SERVER['SERVER_NAME'];
+	include_once(IRT_PATH . 'irt-options.php');
 
 	// create custom plugin settings menu
 	add_action('admin_menu', 'inrealtime_plugin_menu');
@@ -33,7 +41,7 @@ if (is_admin()) {
 
 	function inrealtime_plugin_options() {
 
-		global $irtOptions, $irtUrl, $wp_upload_dir;
+		global $irtOptions, $wp_upload_dir;
 
 	?>
 
@@ -124,8 +132,8 @@ if (is_admin()) {
 						<li>Click the "Register a New Client" button.</li>
 						<li>Name your Application. Something like <b><em><?php echo bloginfo('name'); ?>'s In Real-Time App</em></b> will do nicely.</li>
 						<li>Add a Description.</li>
-						<li>Your website is: <b><em>http://<?php echo $irtUrl; ?></em></b></li>
-						<li>Your OAuth redirect_uri is: <b><em>http://<?php echo $irtUrl . "/wp-content/plugins/in-realtime/irt-callback.php"; ?></em></b></li>
+						<li>Your website is: <b><em><?php echo IRT_SITE; ?></em></b></li>
+						<li>Your OAuth redirect_uri is: <b><em><?php echo IRT_URL . "irt-callback.php"; ?></em></b></li>
 						<li>Click the "Register" button.</li>
 						<li>Copy and Paste the "Client ID" and "Client Secret" into the fields above.</li>
 						<li>Click the "Authenticate!" button below. <i>(another pop-up, here.)</i></li>
@@ -179,8 +187,8 @@ if (is_admin()) {
 						<li>Click the "Register a New Client" button.</li>
 						<li>Name your Application. Something like <b><em><?php echo bloginfo('name'); ?>'s In Real-Time App</em></b> will do nicely.</li>
 						<li>Add a Description.</li>
-						<li>Your website is: <b><em>http://<?php echo $irtUrl; ?></em></b></li>
-						<li>Your OAuth redirect_uri is: <b><em>http://<?php echo $irtUrl . "/wp-content/plugins/in-realtime/irt-callback.php"; ?></em></b></li>
+						<li>Your website is: <b><em><?php echo IRT_SITE; ?></em></b></li>
+						<li>Your OAuth redirect_uri is: <b><em><?php echo IRT_URL . "irt-callback.php"; ?></em></b></li>
 						<li>Click the "Register" button.</li>
 						<li>Copy and Paste the "Client ID" and "Client Secret" into the fields above.</li>
 						<li>Click the "Authenticate!" button below. <i>(another pop-up, here.)</i></li>
@@ -401,7 +409,7 @@ if (is_admin()) {
 							hgt = jQuery(window).height();
 
 						jQuery.ajax({
-							url : "../wp-content/plugins/in-realtime/irt-editor.php",
+							url : "<?php echo IRT_URL; ?>irt-editor.php",
 							data : "client=" + cid + "&secret=" + sid,
 							success : function(resp) {
 
@@ -411,7 +419,7 @@ if (is_admin()) {
 							complete : function() {
 								
 								// pop the auth window.
-								settingsDirectionsWin = window.open("https://instagram.com/oauth/authorize/?client_id=" + cid + "&redirect_uri=" + location.protocol + "//" + document.domain + "/wp-content/plugins/in-realtime/irt-callback.php&response_type=code", "settings", "width=1000, height=" + hgt + ", location=no, resizable=no, toolbar=no, scrollbars=no");
+								settingsDirectionsWin = window.open("https://instagram.com/oauth/authorize/?client_id=" + cid + "&redirect_uri=<?php echo IRT_URL; ?>irt-callback.php&response_type=code", "settings", "width=1000, height=" + hgt + ", location=no, resizable=no, toolbar=no, scrollbars=no");
 								settingsDirectionsWin.focus();
 
 								settingInstructions.fadeOut();
@@ -442,7 +450,7 @@ if (is_admin()) {
 							.fadeIn();
 
 						jQuery.ajax({
-							url : "../wp-content/plugins/in-realtime/irt-getall.php",
+							url : "<?php echo IRT_URL; ?>irt-getall.php",
 							success : function(resp) {
 
 								response = resp;
@@ -511,7 +519,7 @@ if (is_admin()) {
 						}
 
 						jQuery.ajax({
-							url : "../wp-content/plugins/in-realtime/irt-editor.php",
+							url : "<?php echo IRT_URL; ?>irt-editor.php",
 							data : "" + argString + "",
 							success : function(resp) {
 

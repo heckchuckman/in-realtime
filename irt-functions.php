@@ -5,6 +5,16 @@
 require_once('../../../wp-config.php');
 require_once(ABSPATH . "wp-admin" . '/includes/image.php');
 require_once('irt-options.php');
+
+if ( !defined('IRT_SITE') )
+	define( 'IRT_SITE', get_site_url() . '/' );
+
+if ( !defined('IRT_URL') )
+	define( 'IRT_URL', plugin_dir_url( __FILE__ ) );
+
+if ( !defined('IRT_PATH') )
+	define( 'IRT_PATH', plugin_dir_path( __FILE__ ) );
+
 //
 // A few vars that will be handy.
 //
@@ -132,10 +142,8 @@ function irtAssetChecker($assets) {
 	foreach ($assets as $irtPostData) {
 
 		$irtFileCheckStandard = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['' . $irtPostImgPref . '']['url']));
-		// $irtFileCheckLowRes = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['low_resolution']['url']));
-		// $irtFileCheckThumbnail = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['thumbnail']['url']));
-
-		if (!$irtFileCheckStandard) { // && !$irtFileCheckLowRes && !$irtFileCheckThumbnail
+		
+		if (!$irtFileCheckStandard) {
 			
 			$irtPostImg = $irtPostData['images']['' . $irtPostImgPref . '']['url'];
 
