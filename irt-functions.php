@@ -1,10 +1,11 @@
 <?php
 //
-// Some required scripts
+// Some definitiions and required scripts
 //
-require_once('../../../wp-config.php');
-require_once(ABSPATH . "wp-admin" . '/includes/image.php');
-require_once('irt-options.php');
+if ( !defined('IRT_DOCROOT') )
+	define( 'IRT_DOCROOT', $_SERVER['DOCUMENT_ROOT'] );
+
+require_once(IRT_DOCROOT . '/wp-config.php');
 
 if ( !defined('IRT_SITE') )
 	define( 'IRT_SITE', get_site_url() . '/' );
@@ -15,21 +16,100 @@ if ( !defined('IRT_URL') )
 if ( !defined('IRT_PATH') )
 	define( 'IRT_PATH', plugin_dir_path( __FILE__ ) );
 
+require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+
+if (!is_file('irt-options.php')) {
+
+	$irtMakeOptFile = curl_init();
+		curl_setopt($irtMakeOptFile, CURLOPT_URL, IRT_URL . 'irt-editor.php');
+		curl_setopt($irtMakeOptFile, CURLOPT_HEADER, false);
+		curl_setopt($irtMakeOptFile, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($irtMakeOptFile, CURLOPT_POST, true);
+	
+	$irtMakeOptFileSave = curl_exec($irtMakeOptFile);
+	curl_close($irtMakeOptFile);
+
+	// get settings
+	if ($irtMakeOptFileSave) {
+
+		@include_once('irt-options.php');
+
+	}
+
+} else {
+
+	// get settings
+	include_once('irt-options.php');
+
+}
+	
 //
 // A few vars that will be handy.
 //
 $wp_upload_dir = wp_upload_dir();
 $irtUploadFolder = array(
 	'absolute' => $wp_upload_dir['baseurl'] . '/in-realtime-images/',
-	'relative' => '../../uploads/in-realtime-images/'
+	'relative' => $wp_upload_dir['basedir'] . '/in-realtime-images/'
 );
+//
+// Creates and modifies the irt-options.php file
+//
+function irtOptionsReadWrite($options, $type) {
+
+	$irtOptionsFile = 'irt-options.php';
+	
+	// first clear the file - a gross but necessary evil
+	$irtOptionsForClear = fopen($irtOptionsFile, 'w');
+	$irtOptionsClear = fwrite($irtOptionsForClear, '');
+
+	$irtOptionsArray = '<?php' . "\r\n\r\n" .
+
+		'$irtOptions = array(' . "\r\n" .
+			"\t" .'\'userID\' => \'' . $options['user'] . '\',' . "\r\n" .
+			"\t" .'\'clientID\' => \'' . $options['client'] . '\',' . "\r\n" .
+			"\t" .'\'clientSecret\' => \'' . $options['secret'] . '\',' . "\r\n" .
+			"\t" .'\'accessToken\' => \'' . $options['token'] . '\',' . "\r\n" .
+			"\t" .'\'publishState\' => \'' . $options['publish'] . '\',' . "\r\n" .
+			"\t" .'\'publishCategory\' => ' . intval($options['category']) . ',' . "\r\n" .
+			"\t" .'\'publishAuthor\' => ' . intval($options['author']) . ',' . "\r\n" .
+			"\t" .'\'allowComments\' => \'' . $options['comments'] . '\',' . "\r\n" .
+			"\t" .'\'allowPings\' => \'' . $options['pings'] . '\',' . "\r\n" .
+			"\t" .'\'emailNotify\' => array(' . "\r\n" .
+				"\t\t" .'\'notify\' => \'' . $options['notify'] . '\',' . "\r\n" .
+				"\t\t" .'\'address\' => \'' . $options['address'] . '\'' . "\r\n" .
+			"\t" .'),' . "\r\n" .
+			"\t" .'\'imageInPost\' => \'' . $options['image'] . '\',' . "\r\n" .
+			"\t" .'\'imageInFeature\' => array(' . "\r\n" .
+				"\t\t" .'\'attach\' => \'' . $options['feature'] . '\',' . "\r\n" .
+				"\t\t" .'\'size\' => \'' . $options['featimg'] . '\'' . "\r\n" .
+			"\t" .')' . "\r\n" .
+		');' . "\r\n\r\n" .
+
+	'?>';
+
+	// write the new and existing options
+	$irtOptionsWrite = fopen($irtOptionsFile, 'w');
+	$irtOptionsSave = fwrite($irtOptionsWrite, $irtOptionsArray);
+	
+	if ($irtOptionsSave !== false) {
+
+		fclose($irtOptionsWrite);
+		return "your settings have been saved.";
+	
+	} else {
+
+		return "an error occured while saving your settings. please try again.";
+
+	}
+
+}
 //
 // Sends email to desired email address as set in the admin panel.
 //
 function irtEmailNotifications($to, $subject, $message) {
 
-		$headers = 'From: ' . $to . '' . "\r\n" . 'Reply-To: ' . $to . '' . "\r\n" . 'X-Mailer: PHP/' . phpversion();
-		mail($to, $subject, $message, $headers);
+	$headers = 'From: ' . $to . '' . "\r\n" . 'Reply-To: ' . $to . '' . "\r\n" . 'X-Mailer: PHP/' . phpversion();
+	mail($to, $subject, $message, $headers);
 
 }
 //
@@ -78,8 +158,8 @@ function irtUpload($title, $time, $image, $feature) {
 
 		// Create post object
 		$post = array(
-			'comment_status' => 'closed', // 'closed' or 'open'
-			'ping_status' => 'closed', // 'closed' or 'open'
+			'comment_status' => '' . $irtOptions['allowComments'] .'', // 'closed' or 'open'
+			'ping_status' => '' . $irtOptions['allowPings'] .'', // 'closed' or 'open'
 			'post_author' => $irtOptions['publishAuthor'], //The user ID number of the author.
 			'post_category' => array($irtOptions['publishCategory']), //Add some categories.
 			'post_content' => '<img src="' . $absDir . $irtPostFile . '" alt="' . irtTitleAndTags($title, 'title') . '" />', //The full text of the post.
@@ -133,6 +213,7 @@ function irtUpload($title, $time, $image, $feature) {
 }
 //
 // Checks the assets to make sure they don't already exist on the server
+// BUG : when the User changes the main Img size pref it recreates the post with the new main image settings.
 //
 function irtAssetChecker($assets) {
 
@@ -141,11 +222,16 @@ function irtAssetChecker($assets) {
 
 	foreach ($assets as $irtPostData) {
 
-		$irtFileCheckStandard = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['' . $irtPostImgPref . '']['url']));
-		
-		if (!$irtFileCheckStandard) {
-			
-			$irtPostImg = $irtPostData['images']['' . $irtPostImgPref . '']['url'];
+		/*
+			$irtFileCheckPost = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['' . $irtPostImgPref . '']['url']));
+			$irtFileCheckFeat = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['' . $irtFeatureImgPref . '']['url']));
+		*/
+
+		$irtFileCheckStandard = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['standard_resolution']['url']));
+		$irtFileCheckLowRes = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['low_resolution']['url']));
+		$irtFileCheckThumb = is_file($irtUploadFolder['relative'] . basename($irtPostData['images']['thumbnail']['url']));
+
+		if (!$irtFileCheckStandard && !$irtFileCheckLowRes && !$irtFileCheckThumb) {
 
 			if ($irtOptions['imageInFeature']['attach'] == 'yes') {
 
@@ -157,7 +243,8 @@ function irtAssetChecker($assets) {
 				$irtFeatureImg = null;
 			
 			}
-			
+
+			$irtPostImg = $irtPostData['images']['' . $irtPostImgPref . '']['url'];
 			irtUpload('' . $irtPostData['caption']['text'] . '', $irtPostData['created_time'], $irtPostImg, $irtFeatureImg);
 
 		}
