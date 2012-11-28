@@ -1,0 +1,66 @@
+.settings-block {
+	float: left;
+	width: 60%;
+	margin-right: 24px;
+}
+
+.status-block {
+	float: left;
+	width: 200px;
+	border: 1px dotted #cecece;
+	padding: 6px 18px 18px 18px;
+	margin-top: 18px;
+}
+
+.setting-good {
+	font-weight: bold;
+	color: green;
+}
+
+.setting-bad {
+	font-weight: bold;
+	color: red;
+}
+
+form {
+	margin: 0 0 32px 0;
+}
+
+#irt-client-edit label {
+	width: 90px;
+}
+
+label {
+	display: inline-block;
+	width: 150px;
+	margin-bottom: 8px;
+	padding-top: 4px;
+}
+
+select {
+	width: 140px;
+	margin-bottom: 8px;
+}
+
+#irt-settings-messages {
+	padding: 0px 12px;
+	border: 1px black solid;
+	background: #cecece;
+	display: none;
+}
+
+.no-work-y {
+	color: #cecece;
+}
+
+#auth-change #irt-instructions,
+#auth-set #irt-client-change,
+#auth-set #irt-client-info,
+#auth-change #irt-client-edit,
+#irt-client-cancel,
+#auth-change #irt-client-submit,
+.irt-settings-choice,
+#irt-getall-spinner,
+#irt-getall-message {
+	display: none;
+}
